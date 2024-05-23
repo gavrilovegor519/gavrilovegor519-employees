@@ -77,24 +77,29 @@ function staff_add_custom_box()
 function staff_custom_box_html($post)
 {
     // сначала получаем значения этих полей
-    $staff_name = get_post_meta($post->ID, 'name', true);
-    $staff_age = get_post_meta($post->ID, 'age', true);
-    $staff_phone = get_post_meta($post->ID, 'phone', true);
+    $staff_name = get_post_meta($post->ID, 'employee_name', true);
+    $staff_age = get_post_meta($post->ID, 'employee_age', true);
+    $staff_phone = get_post_meta($post->ID, 'employee_phone', true);
 
-    wp_nonce_field('seopostsettingsupdate-' . $post->ID, '_truenonce');
+    wp_nonce_field('gavrilovegor519-employees-' . $post->ID, '_truenonce');
 
 ?>
-    <label for="name_box">Имя сотрудника</label>
+    <label for="image_box">Фото сотрудника</label>
+    <input type="file" id="image_box" name="image_box" value="">
+
+    <br />
+
+    <label for="name">Имя сотрудника</label>
     <input type="text" value="<?= esc_attr($staff_name); ?>" id="name" name="name" class="regular-text">
 
     <br />
 
-    <label for="age_box">Возраст сотрудника</label>
+    <label for="age">Возраст сотрудника</label>
     <input type="number" value="<?= esc_attr($staff_age); ?>" id="age" name="age" class="regular-text">
 
     <br />
 
-    <label for="phone_box">Номер телефона сотрудника</label>
+    <label for="phone">Номер телефона сотрудника</label>
     <input type="tel" value="<?= esc_attr($staff_phone); ?>" id="phone" name="phone" class="regular-text">
 <?php
 }
@@ -105,7 +110,7 @@ function true_save_meta_staff($post_id, $post)
 {
 
     // проверка одноразовых полей
-    if (!isset($_POST['_truenonce']) || !wp_verify_nonce($_POST['_truenonce'], 'seopostsettingsupdate-' . $post->ID)) {
+    if (!isset($_POST['_truenonce']) || !wp_verify_nonce($_POST['_truenonce'], 'gavrilovegor519-employees-' . $post->ID)) {
         return $post_id;
     }
 
@@ -126,20 +131,44 @@ function true_save_meta_staff($post_id, $post)
         return $post_id;
     }
 
+    if(!empty($_FILES['image_box']['name'])) {
+		$supported_types = array('image/jpeg', 'image/png', 'image/webp');
+		
+		// Получаем тип файла
+		$arr_file_type = wp_check_filetype(basename($_FILES['image_box']['name']));
+		$uploaded_type = $arr_file_type['type'];
+		
+		// Проверяем тип файла на совместимость
+		if(in_array($uploaded_type, $supported_types)) {
+			$upload = wp_upload_bits($_FILES['image_box']['name'], null, file_get_contents($_FILES['image_box']['tmp_name']));
+	
+			if(isset($upload['error']) && $upload['error'] != 0) {
+                error_log($message, 3, $pluginlog);
+			} else {
+				add_post_meta($post_id, 'employee_photo', $upload);
+				update_post_meta($post_id, 'employee_photo', $upload);
+			}
+		} else {
+			wp_die("The file type that you've uploaded is not a JPEG/PNG/WebP.");
+		}
+		
+	}
+	
+
     if (isset($_POST['name'])) {
-        update_post_meta($post_id, 'name', sanitize_text_field($_POST['name']));
+        update_post_meta($post_id, 'employee_name', sanitize_text_field($_POST['name']));
     } else {
-        delete_post_meta($post_id, 'name');
+        delete_post_meta($post_id, 'employee_name');
     }
     if (isset($_POST['phone'])) {
-        update_post_meta($post_id, 'phone', sanitize_text_field($_POST['phone']));
+        update_post_meta($post_id, 'employee_phone', sanitize_text_field($_POST['phone']));
     } else {
-        delete_post_meta($post_id, 'phone');
+        delete_post_meta($post_id, 'employee_phone');
     }
     if (isset($_POST['age'])) {
-        update_post_meta($post_id, 'age', sanitize_text_field($_POST['age']));
+        update_post_meta($post_id, 'employee_age', sanitize_text_field($_POST['age']));
     } else {
-        delete_post_meta($post_id, 'age');
+        delete_post_meta($post_id, 'employee_age');
     }
 
     return $post_id;
