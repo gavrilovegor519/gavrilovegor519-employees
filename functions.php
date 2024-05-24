@@ -153,8 +153,8 @@ function true_save_meta_staff($post_id, $post)
 			if(isset($upload['error']) && $upload['error'] != 0) {
                 error_log($message, 3, $pluginlog);
 			} else {
-				add_post_meta($post_id, 'employee_photo', $upload);
-				update_post_meta($post_id, 'employee_photo', $upload);
+				add_post_meta($post_id, 'employee_photo', $upload['url']);
+				update_post_meta($post_id, 'employee_photo', $upload['url']);
 			}
 		} else {
 			wp_die("The file type that you've uploaded is not a JPEG/PNG/WebP.");
