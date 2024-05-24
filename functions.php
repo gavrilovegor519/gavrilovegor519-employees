@@ -74,6 +74,14 @@ function staff_add_custom_box()
     }
 }
 
+add_action('post_edit_form_tag', 'post_edit_form_tag');
+
+function post_edit_form_tag($post) {
+    if ($post->post_type === 'staff') {
+        echo ' enctype="multipart/form-data"';
+    }
+}
+
 function staff_custom_box_html($post)
 {
     // сначала получаем значения этих полей
@@ -154,7 +162,6 @@ function true_save_meta_staff($post_id, $post)
 		
 	}
 	
-
     if (isset($_POST['name'])) {
         update_post_meta($post_id, 'employee_name', sanitize_text_field($_POST['name']));
     } else {
