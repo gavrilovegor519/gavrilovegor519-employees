@@ -203,7 +203,7 @@ function staff_list_shortcode()
 
             $output .= '<div class="staff-item">';
             $output .= '<h3>' . $name . '</h3>';
-            $output .= '<img src="' . $photo . '" alt="' . $name . '"/>';
+            $output .= '<img src="' . $photo . '" alt="' . $name . '" width="300px" />';
             if (!empty($phone)) {
                 $output .= '<p>Телефон: ' . esc_html($phone) . '</p>';
             }
