@@ -182,17 +182,29 @@ function true_save_meta_staff($post_id, $post)
 
 add_shortcode('staff_list', 'staff_list_shortcode');
 
-function staff_list_shortcode()
+function staff_list_shortcode($atts)
 {
+    $atts = shortcode_atts(array(
+        'department' => '', 
+    ), $atts);
+
     $args = array(
         'post_type' => 'staff',
-        'posts_per_page' => -1, // Выводим все записи
+        'posts_per_page' => -1, 
+        'tax_query' => array(
+            array(
+                'taxonomy' => 'department',
+                'field' => 'slug', 
+                'terms' => $atts['department'], 
+            ),
+        ),
     );
 
     $query = new WP_Query($args);
 
     if ($query->have_posts()) {
         $output = '<div class="staff-list">';
+        $output .= '<h2>' . get_term_by('slug', $atts['department'], 'department')->name . '<h2/>'; 
         while ($query->have_posts()) {
             $query->the_post();
 
@@ -216,7 +228,7 @@ function staff_list_shortcode()
         wp_reset_postdata();
         return $output;
     } else {
-        return 'Нет сотрудников';
+        return 'Нет сотрудников в этом отделе';
     }
 }
 
